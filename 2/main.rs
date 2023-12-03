@@ -6,7 +6,9 @@ fn main() -> Result<(), String> {
 
     let input = {
         let mut buffer = String::new();
-        input_file.read_to_string(&mut buffer).map_err(|err| err.to_string())?;
+        input_file
+            .read_to_string(&mut buffer)
+            .map_err(|err| err.to_string())?;
         buffer
     };
 
@@ -20,15 +22,20 @@ fn main() -> Result<(), String> {
 }
 
 fn get_part1_solution(input: &str) -> u32 {
-    parse_games(input).filter(|game| {
-        game.sets.iter().all(|set| {
-            (set.red <= 12) & (set.green <= 13) & (set.blue <= 14)
+    parse_games(input)
+        .filter(|game| {
+            game.sets
+                .iter()
+                .all(|set| (set.red <= 12) & (set.green <= 13) & (set.blue <= 14))
         })
-    }).map(|game| game.id).sum()
+        .map(|game| game.id)
+        .sum()
 }
 
 fn get_part2_solution(input: &str) -> u32 {
-    parse_games(input).map(|game| game.fewest_required_cubes().power()).sum()
+    parse_games(input)
+        .map(|game| game.fewest_required_cubes().power())
+        .sum()
 }
 
 struct Game {
@@ -72,25 +79,33 @@ impl CubeSet {
 
 fn parse_games(input: &str) -> impl Iterator<Item = Game> + '_ {
     input.lines().map(|line| {
-        let line = line.strip_prefix("Game ").expect("every line starts with this prefix");
+        let line = line
+            .strip_prefix("Game ")
+            .expect("every line starts with this prefix");
         let (id, sets) = line.split_once(':').expect("every line contains a colon");
 
         let id = u32::from_str_radix(id, 10).expect("id is always a valid number");
-        let sets = sets.split(';').map(|set| {
-            let mut parsed_set = CubeSet::empty();
-            for entry in set.split(',') {
-                let entry = entry.trim();
-                let (count, color) = entry.split_once(' ').expect("entries are always in the format \"count color\"");
-                let count = u32::from_str_radix(count, 10).expect("count is always a valid number");
-                match color {
-                    "red" => parsed_set.red += count,
-                    "green" => parsed_set.green += count,
-                    "blue" => parsed_set.blue += count,
-                    _ => panic!("Unknown color: {}", color),
+        let sets = sets
+            .split(';')
+            .map(|set| {
+                let mut parsed_set = CubeSet::empty();
+                for entry in set.split(',') {
+                    let entry = entry.trim();
+                    let (count, color) = entry
+                        .split_once(' ')
+                        .expect("entries are always in the format \"count color\"");
+                    let count =
+                        u32::from_str_radix(count, 10).expect("count is always a valid number");
+                    match color {
+                        "red" => parsed_set.red += count,
+                        "green" => parsed_set.green += count,
+                        "blue" => parsed_set.blue += count,
+                        _ => panic!("Unknown color: {}", color),
+                    }
                 }
-            }
-            parsed_set
-        }).collect();
+                parsed_set
+            })
+            .collect();
 
         Game { id, sets }
     })
