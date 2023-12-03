@@ -1,4 +1,4 @@
-use std::{fs::File, io::Read, iter::Iterator};
+use std::{cmp, fs::File, io::Read, iter::Iterator};
 
 fn main() -> Result<(), String> {
     let input_file_path = parse_args()?;
@@ -10,20 +10,44 @@ fn main() -> Result<(), String> {
         buffer
     };
 
-    let sum: u32 = parse_games(&input).filter(|game| {
+    let part1_solution = get_part1_solution(&input);
+    println!("solution to part 1: {}", part1_solution);
+
+    let part2_solution = get_part2_solution(&input);
+    println!("solution to part 2: {}", part2_solution);
+
+    Ok(())
+}
+
+fn get_part1_solution(input: &str) -> u32 {
+    parse_games(input).filter(|game| {
         game.sets.iter().all(|set| {
             (set.red <= 12) & (set.green <= 13) & (set.blue <= 14)
         })
-    }).map(|game| game.id).sum();
+    }).map(|game| game.id).sum()
+}
 
-    println!("sum of IDs of possible games: {}", sum);
-
-    Ok(())
+fn get_part2_solution(input: &str) -> u32 {
+    parse_games(input).map(|game| game.fewest_required_cubes().power()).sum()
 }
 
 struct Game {
     id: u32,
     sets: Vec<CubeSet>,
+}
+
+impl Game {
+    fn fewest_required_cubes(&self) -> CubeSet {
+        let mut fewest_required_cubes = CubeSet::empty();
+
+        for set in &self.sets {
+            fewest_required_cubes.red = cmp::max(fewest_required_cubes.red, set.red);
+            fewest_required_cubes.green = cmp::max(fewest_required_cubes.green, set.green);
+            fewest_required_cubes.blue = cmp::max(fewest_required_cubes.blue, set.blue);
+        }
+
+        fewest_required_cubes
+    }
 }
 
 struct CubeSet {
@@ -39,6 +63,10 @@ impl CubeSet {
             green: 0,
             blue: 0,
         }
+    }
+
+    fn power(&self) -> u32 {
+        self.red * self.green * self.blue
     }
 }
 
