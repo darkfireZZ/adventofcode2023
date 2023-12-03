@@ -1,5 +1,6 @@
 
 ARGS = -O --edition 2021
+ARGS += -C debug-assertions
 
 BIN_NAME = solution
 
