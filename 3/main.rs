@@ -4,7 +4,6 @@ use std::{
 };
 
 const INPUT: &[u8] = include_bytes!("input");
-
 const ROW_LENGTH: usize = 140 + 1;
 
 fn main() {
@@ -26,23 +25,14 @@ fn main() {
 }
 
 fn get_sum_of_gear_ratios(input_with_sentinels: &[u8]) -> u32 {
-    let mut sum = 0;
-    for index in input_with_sentinels
+    input_with_sentinels
         .into_iter()
         .enumerate()
         .filter_map(|(index, value)| if *value == b'*' { Some(index) } else { None })
-    {
-        let adjacent_numbers = adjacent_numbers(index, input_with_sentinels);
-
-        if adjacent_numbers.len() != 2 {
-            continue;
-        }
-
-        let gear_ratio = adjacent_numbers[0].value() * adjacent_numbers[1].value();
-        sum += gear_ratio;
-    }
-
-    sum
+        .map(|index| adjacent_numbers(index, input_with_sentinels))
+        .filter(|adjacent_numbers| adjacent_numbers.len() == 2)
+        .map(|adjacent_numbers| adjacent_numbers[0].value() * adjacent_numbers[1].value())
+        .sum()
 }
 
 fn adjacent_numbers(gear_index: usize, input_with_sentinels: &[u8]) -> Vec<Number> {
@@ -68,12 +58,12 @@ fn adjacent_numbers(gear_index: usize, input_with_sentinels: &[u8]) -> Vec<Numbe
         .filter_map(|candidate| expand_number_at(candidate, input_with_sentinels))
     {
         if let Some(prev_number) = adjacent_numbers.last() {
-            if number.start_of_number != prev_number.start_of_number {
-                adjacent_numbers.push(number);
+            if number.start_of_number == prev_number.start_of_number {
+                continue;
             }
-        } else {
-            adjacent_numbers.push(number);
         }
+
+        adjacent_numbers.push(number);
     }
 
     adjacent_numbers
@@ -103,7 +93,7 @@ fn expand_number_at(index: usize, input_with_sentinels: &[u8]) -> Option<Number>
 }
 
 fn get_sum_of_part_numbers(input_with_sentinels: &[u8]) -> u32 {
-    let mut index = ROW_LENGTH + 1;
+    let mut index = 0;
 
     let mut sum = 0;
     while let Some(start_of_number) = input_with_sentinels[index..]
