@@ -1,5 +1,12 @@
 
-# This was solved using vim and bash
+# This was solved using manual binary search with the help of vim and bash
+
+# ======= INPUT ======= #
+
+Time:        48     87     69     81
+Distance:   255   1288   1117   1623
+
+# ======= PART 1 ======= #
 
 255 in 48:
 7 * 41 = 287
@@ -18,3 +25,16 @@
 44 - 37 + 1 = 8
 
 35 * 50 * 18 * 8 = 252000
+
+# ======= PART 2 ======= #
+
+Time:     48876981
+Distance: 255128811171623
+
+42934733 * 5942248 = 255128831299784
+42934733 - 5942248 + 1 = 36992486
+
+# ======= SOLUTIONS ======= #
+
+part 1: 252000
+part 2: 36992486
