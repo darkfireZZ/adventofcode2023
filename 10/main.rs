@@ -1,12 +1,19 @@
-const EXAMPLE_INPUT: &str = include_str!("example_input");
+const EXAMPLE_INPUT_1: &str = include_str!("example_input_1");
 const EXAMPLE_SOLUTION_1: u64 = 8;
+const EXAMPLE_INPUT_2: &str = include_str!("example_input_2");
+const EXAMPLE_SOLUTION_2: u64 = 10;
 const INPUT: &str = include_str!("input");
 
 fn main() {
-    assert_eq!(part1(EXAMPLE_INPUT, 5), EXAMPLE_SOLUTION_1);
+    assert_eq!(part1(EXAMPLE_INPUT_1, 5), EXAMPLE_SOLUTION_1);
 
     let p1_sol = part1(INPUT, 140);
     println!("part 1: {}", p1_sol);
+
+    assert_eq!(part2(EXAMPLE_INPUT_2, 20), EXAMPLE_SOLUTION_2);
+
+    let p2_sol = part2(INPUT, 140);
+    println!("part 2: {}", p2_sol);
 }
 
 fn part1(input: &str, dimensions: usize) -> u64 {
@@ -29,6 +36,11 @@ fn part1(input: &str, dimensions: usize) -> u64 {
     }
 
     counter / 2
+}
+
+fn part2(input: &str, dimensions: usize) -> u64 {
+    let maze = Maze::new(input, dimensions);
+    maze.area_inside()
 }
 
 struct Maze<'a> {
@@ -92,6 +104,64 @@ impl<'a> Maze<'a> {
         debug_assert!(y < self.dimensions);
 
         y * (self.dimensions + 1) + x
+    }
+
+    fn area_inside(&self) -> u64 {
+        let mut markers = vec![false; self.maze.len()];
+        let (mut x, mut y, start_tile) = self.starting_position();
+        let mut direction = start_tile.to_directions().expect("tile is a pipe").0;
+        let mut tile;
+        loop {
+            markers[self.coords_to_slice_index(x, y)] = true;
+            (x, y) = direction
+                .walk(x, y)
+                .expect("pipes will not go across the border");
+            tile = self.tile_at(x, y);
+            if let Some(next_dir) = tile.other_pipe_end(direction) {
+                direction = next_dir;
+            } else {
+                break;
+            }
+        }
+
+        let mut counter = 0;
+        for y in 0..self.dimensions {
+            let mut inside = false;
+            let mut prev_tile = Tile::Vertical;
+            for x in 0..self.dimensions {
+                if markers[self.coords_to_slice_index(x, y)] {
+                    let mut tile = self.tile_at(x, y);
+                    if tile == Tile::Start {
+                        tile = start_tile;
+                    }
+                    match tile {
+                        Tile::Vertical => {
+                            inside = !inside;
+                        }
+                        Tile::Horizontal => {}
+                        Tile::NorthEast | Tile::SouthEast => {
+                            prev_tile = tile;
+                        }
+                        Tile::NorthWest => {
+                            if prev_tile == Tile::SouthEast {
+                                inside = !inside;
+                            }
+                        }
+                        Tile::SouthWest => {
+                            if prev_tile == Tile::NorthEast {
+                                inside = !inside;
+                            }
+                        }
+                        _ => panic!("expected a pipe"),
+                    }
+                } else if inside {
+                    counter += 1;
+                }
+            }
+            debug_assert!(!inside);
+        }
+
+        counter
     }
 }
 
