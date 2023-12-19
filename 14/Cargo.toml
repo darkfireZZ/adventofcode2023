@@ -1,0 +1,10 @@
+[package]
+name = "aoc_14"
+version = "0.1.0"
+edition = "2021"
+
+[profile.dev]
+opt-level = 3
+
+[dependencies]
+aoclib = { git = "https://github.com/darkfireZZ/aocutils", rev = "13c820ccf29906d153590e1a099bec22cabdb196" }
