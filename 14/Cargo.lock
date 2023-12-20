@@ -12,4 +12,4 @@ dependencies = [
 [[package]]
 name = "aoclib"
 version = "0.1.0"
-source = "git+https://github.com/darkfireZZ/aocutils?rev=13c820ccf29906d153590e1a099bec22cabdb196#13c820ccf29906d153590e1a099bec22cabdb196"
+source = "git+https://github.com/darkfireZZ/aocutils?rev=3760c4bff1206cd85b1085a6e9c1b353203b9999#3760c4bff1206cd85b1085a6e9c1b353203b9999"
